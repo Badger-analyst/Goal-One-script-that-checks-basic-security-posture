@@ -24,3 +24,13 @@ Requires Windows PowerShell 5.1+ (default on Windows 10/11).
 For best results, run as Administrator.
 
 This is not a replacement for enterprise security tools, but a quick health check.
+
+microsoft-cloud-security-checklist-2025
+
+Inside:
+
+README.md → Markdown checklist (easy for IT staff to use).
+
+(Optional) checklist.ps1 → PowerShell script that pulls Azure Secure Score, checks MFA status, and exports results to CSV.
+
+.gitignore → Standard PowerShell/Windows template.
