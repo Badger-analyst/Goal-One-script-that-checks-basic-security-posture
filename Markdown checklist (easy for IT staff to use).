@@ -1,0 +1,12 @@
+What this script does
+
+✔ Connects to Microsoft Graph with Security + Audit scopes
+✔ Checks MFA enforcement (per-user & export)
+✔ Pulls Microsoft Secure Score
+✔ Lists and exports risky users (from Entra ID Identity Protection)
+✔ Exports latest sign-in logs to CSV
+
+Install-Module -Name Microsoft.Graph -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Identity.SignIns -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Security -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
