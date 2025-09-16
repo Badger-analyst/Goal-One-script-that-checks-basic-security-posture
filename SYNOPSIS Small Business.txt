@@ -1,0 +1,60 @@
+<# 
+.SYNOPSIS
+  Small Business Cybersecurity Health Check for Windows 10/11
+.DESCRIPTION
+  Checks firewall, antivirus, malware, and recommended ACLs.
+  Run as Administrator for full results.
+#>
+
+Write-Host "=== Small Business Cybersecurity Health Check ===" -ForegroundColor Cyan
+
+# 1. Firewall Check
+Write-Host "`n[+] Checking Firewall Status..." -ForegroundColor Yellow
+$firewallProfiles = Get-NetFirewallProfile
+foreach ($profile in $firewallProfiles) {
+    Write-Host " - $($profile.Name) Firewall Enabled: $($profile.Enabled)"
+}
+if ($firewallProfiles.Enabled -contains $false) {
+    Write-Host "[!] Warning: One or more firewall profiles are disabled!" -ForegroundColor Red
+}
+
+# 2. Antivirus Check
+Write-Host "`n[+] Checking Antivirus Status..." -ForegroundColor Yellow
+$av = Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntivirusProduct 2>$null
+if ($av) {
+    foreach ($product in $av) {
+        Write-Host " - $($product.displayName): $($product.productState)"
+    }
+} else {
+    Write-Host "[!] No Antivirus detected!" -ForegroundColor Red
+}
+
+# 3. Quick Malware Scan (Windows Defender only)
+Write-Host "`n[+] Running Quick Malware Scan..." -ForegroundColor Yellow
+try {
+    Start-MpScan -ScanType QuickScan
+    Write-Host "Quick Scan initiated. Results available in Windows Security > Protection history."
+} catch {
+    Write-Host "[!] Could not start Defender scan. Ensure Windows Defender is enabled." -ForegroundColor Red
+}
+
+# 4. Suspicious Processes (Basic Check)
+Write-Host "`n[+] Checking for suspicious processes..." -ForegroundColor Yellow
+$suspicious = Get-Process | Where-Object { $_.Path -and ($_.Path -like "*temp*" -or $_.Path -like "*AppData*") }
+if ($suspicious) {
+    Write-Host "[!] Suspicious processes found:" -ForegroundColor Red
+    $suspicious | Select-Object ProcessName, Id, Path | Format-Table -AutoSize
+} else {
+    Write-Host "No obvious suspicious processes found."
+}
+
+# 5. Recommended Firewall Rules (Ingress/Egress ACLs)
+Write-Host "`n[+] Recommended Firewall ACLs (baseline)..." -ForegroundColor Yellow
+Write-Host " - Inbound: Allow RDP (3389) only if needed, restrict by IP."
+Write-Host " - Inbound: Allow HTTP (80) / HTTPS (443) if running a web server."
+Write-Host " - Block all other inbound traffic by default."
+Write-Host " - Outbound: Allow DNS (53), HTTP/HTTPS, Email (25/465/587/993)."
+Write-Host " - Block outbound to unusual ports (e.g., 135, 139, 445)."
+
+Write-Host "`n=== Cybersecurity Check Completed ===" -ForegroundColor Cyan
+
