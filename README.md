@@ -17,3 +17,10 @@ A simple PowerShell script for **small businesses** to quickly check the cyberse
 3. Run the script:
    ```powershell
    .\cyber-check.ps1
+Notes
+
+Requires Windows PowerShell 5.1+ (default on Windows 10/11).
+
+For best results, run as Administrator.
+
+This is not a replacement for enterprise security tools, but a quick health check.
